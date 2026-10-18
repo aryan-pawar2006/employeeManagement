@@ -13,24 +13,25 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
-public class ProjectServiceImp implements ProjectService{
+public class ProjectServiceImp implements ProjectService {
 
     ProjectRepo projectRepo;
     TaskRepo taskRepo;
     EmployeeRepo employeeRepo;
-    public ProjectServiceImp(ProjectRepo projectRepo,TaskRepo taskRepo,EmployeeRepo employeeRepo ) {
+
+    public ProjectServiceImp(ProjectRepo projectRepo, TaskRepo taskRepo, EmployeeRepo employeeRepo) {
         this.projectRepo = projectRepo;
-        this.taskRepo=taskRepo;
-        this.employeeRepo=employeeRepo;
+        this.taskRepo = taskRepo;
+        this.employeeRepo = employeeRepo;
     }
 
     @Override
-    public ProjectResponseDTO createProject(ProjectRequestDTO project)
-    {
-        ProjectEntity project1=new ProjectEntity();
+    public ProjectResponseDTO createProject(ProjectRequestDTO project) {
+        ProjectEntity project1 = new ProjectEntity();
 
         project1.setCreatedAt(project.getCreatedAt());
         project1.setDescription(project.getDescription());
@@ -38,7 +39,7 @@ public class ProjectServiceImp implements ProjectService{
 
         projectRepo.save(project1);
 
-        ProjectResponseDTO responseDTO=new ProjectResponseDTO();
+        ProjectResponseDTO responseDTO = new ProjectResponseDTO();
 
         responseDTO.setId(project1.getId());
         responseDTO.setCreatedAt(project.getCreatedAt());
@@ -50,34 +51,34 @@ public class ProjectServiceImp implements ProjectService{
 
     @Override
     public TaskResponseDTO createTask(TaskRequestDTO task) {
-        TaskEntity task1=new TaskEntity();
+        TaskEntity task1 = new TaskEntity();
 
-        ProjectEntity project=projectRepo.findById(task.getProjectId())
-                        .orElseThrow(()->new ResourceNotFound("project does not found"));
+        ProjectEntity project = projectRepo.findById(task.getProjectId())
+                .orElseThrow(() -> new ResourceNotFound("project does not found"));
 
         task1.setProject(project);
         task1.setAssignedDate(task.getAssignedDate());
         task1.setStatus(task.getStatus());
 
-         taskRepo.save(task1);
+        taskRepo.save(task1);
 
-         TaskResponseDTO responseDTO=new TaskResponseDTO();
+        TaskResponseDTO responseDTO = new TaskResponseDTO();
 
-         ProjectEntity project1=projectRepo.findById(task1.getId())
-                 .orElseThrow(()->new RuntimeException("project not found!"));
-         ProjectResponseDTO responseDTO1=new ProjectResponseDTO();
-         responseDTO1.setId(project1.getId());
-         responseDTO1.setTitle(project1.getTitle());
-         responseDTO1.setDescription(project1.getDescription());
-         responseDTO1.setCreatedAt(project1.getCreatedAt());
+        ProjectEntity project1 = projectRepo.findById(task1.getId())
+                .orElseThrow(() -> new RuntimeException("project not found!"));
+        ProjectResponseDTO responseDTO1 = new ProjectResponseDTO();
+        responseDTO1.setId(project1.getId());
+        responseDTO1.setTitle(project1.getTitle());
+        responseDTO1.setDescription(project1.getDescription());
+        responseDTO1.setCreatedAt(project1.getCreatedAt());
 
 
-         responseDTO.setProject(responseDTO1);
-         responseDTO.setStatus(task1.getStatus());
-         responseDTO.setId(task1.getId());
-         responseDTO.setAssignedDate(task1.getAssignedDate());
+        responseDTO.setProject(responseDTO1);
+        responseDTO.setStatus(task1.getStatus());
+        responseDTO.setId(task1.getId());
+        responseDTO.setAssignedDate(task1.getAssignedDate());
 
-         return responseDTO;
+        return responseDTO;
     }
 
     @Override
@@ -88,63 +89,64 @@ public class ProjectServiceImp implements ProjectService{
 
     @Override
     public List<EmployeeResponseDTO> seeAllEmp(Integer projectId) {
-        List<EmployeeEntity> employeeList=employeeRepo.findAll();
+        List<EmployeeEntity> employeeList = employeeRepo.findAll();
 
         employeeList.stream().filter(employeeEntity -> {
                     TaskEntity task = taskRepo.getById(employeeEntity.getId());
-                    return task.getProject().getId()==projectId;
+                    return task.getProject().getId() == projectId;
                 }
         );
 
-      List<EmployeeResponseDTO> list=new ArrayList<>();
+        List<EmployeeResponseDTO> list = new ArrayList<>();
 
-      for (EmployeeEntity employee:employeeList)
-      {
-          EmployeeResponseDTO responseDTO=new EmployeeResponseDTO();
-          responseDTO.setSalary(employee.getSalary());
-          responseDTO.setName(employee.getName());
-          responseDTO.setExperience(employee.getExperience());
-          responseDTO.setId(employee.getId());
-          responseDTO.setTaskId(employee.getTaskId());
-          list.add(responseDTO);
-      }
-      return  list;
+        for (EmployeeEntity employee : employeeList) {
+            EmployeeResponseDTO responseDTO = new EmployeeResponseDTO();
+            responseDTO.setSalary(employee.getSalary());
+            responseDTO.setName(employee.getName());
+            responseDTO.setExperience(employee.getExperience());
+            responseDTO.setId(employee.getId());
+            responseDTO.setTaskId(employee.getTaskId());
+            list.add(responseDTO);
+        }
+        return list;
     }
 
     @Override
     public List<TaskResponseDTO> getAllTasks(Integer projectId) {
-        List<TaskEntity> taskList=taskRepo.findAll();
-        taskList.stream().filter(taskEntity ->
-        {
-            ProjectEntity project=projectRepo.findById(taskEntity.getId())
-                    .orElseThrow(()->new ResourceNotFound("project does not found !"));
-            return project.getId() == projectId;
-        }).toList();
 
-        List<TaskResponseDTO> responseDTOs=new ArrayList<>();
+        ProjectEntity project = projectRepo.findById(projectId)
+                .orElseThrow(() ->
+                        new ResourceNotFound("Project not found: " + projectId));
 
-        for (TaskEntity task:taskList)
-        {
-            TaskResponseDTO responseDTO1=new TaskResponseDTO();
+        List<TaskEntity> tasks = taskRepo.findByProject_Id(projectId);
 
-            responseDTO1.setId(task.getId());
-            responseDTO1.setAssignedDate(task.getAssignedDate());
+        List<TaskResponseDTO> responses = new ArrayList<>();
 
-            //here we have to fin the project first and then set all the values of it to project Response DTO and then set to response:
-            ProjectEntity project1=projectRepo.findById(task.getId())
-                    .orElseThrow(()->new RuntimeException("project not found!"));
-            ProjectResponseDTO responseDTO=new ProjectResponseDTO();
-            responseDTO.setId(project1.getId());
-            responseDTO.setTitle(project1.getTitle());
-            responseDTO.setDescription(project1.getDescription());
-            responseDTO.setCreatedAt(project1.getCreatedAt());
+        for (TaskEntity task : tasks) {
 
+            TaskResponseDTO response = new TaskResponseDTO();
+            response.setId(task.getId());
+            response.setAssignedDate(task.getAssignedDate());
+            response.setStatus(task.getStatus());
 
-            responseDTO1.setProject(responseDTO);
-            responseDTO1.setStatus(task.getStatus());
+            ProjectEntity taskProject = task.getProject();
 
-            responseDTOs.add(responseDTO1);
+            if (taskProject == null) {
+                throw new IllegalStateException(
+                        "Task " + task.getId() + " has no associated project"
+                );
+            }
+
+            ProjectResponseDTO projectDTO = new ProjectResponseDTO();
+            projectDTO.setId(taskProject.getId());
+            projectDTO.setTitle(taskProject.getTitle());
+            projectDTO.setDescription(taskProject.getDescription());
+            projectDTO.setCreatedAt(taskProject.getCreatedAt());
+
+            response.setProject(projectDTO);
+            responses.add(response);
         }
-        return responseDTOs;
+
+        return responses;
     }
 }

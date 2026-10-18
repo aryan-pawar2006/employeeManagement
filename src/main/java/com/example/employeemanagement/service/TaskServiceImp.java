@@ -65,12 +65,12 @@ public class TaskServiceImp implements TaskService{
         taskEntity.setStatus(task.getStatus());
         taskEntity.setAssignedDate(task.getAssignedDate());
         //find out the projet first with help of id:
-        ProjectEntity project1=projectRepo.findById(task.getProjectId())
-                        .orElseThrow(()->new ResourceNotFound("project not found"));
-        taskEntity.setProject(project1);
+        taskEntity.setProject(project);
 
         taskRepo.save(taskEntity);
 
+
+        // for creating the response we are doing follwing things :
         TaskResponseDTO responseDTO=new TaskResponseDTO();
 
         responseDTO.setStatus(taskEntity.getStatus());
@@ -79,13 +79,13 @@ public class TaskServiceImp implements TaskService{
         //get project first:
         ProjectEntity project2=projectRepo.findById(task.getProjectId())
                 .orElseThrow(()->new ResourceNotFound("project not found"));
+
         ProjectResponseDTO  responseDTO1=new ProjectResponseDTO();
         responseDTO1.setId(project2.getId());
         responseDTO1.setCreatedAt(project2.getCreatedAt());
         responseDTO1.setDescription(project2.getDescription());
         responseDTO1.setTitle(project2.getTitle());
         responseDTO.setProject(responseDTO1);
-
         return responseDTO;
     }
     @Override
