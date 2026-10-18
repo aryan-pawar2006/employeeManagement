@@ -7,6 +7,7 @@ import com.example.employeemanagement.entity.TaskEntity;
 import com.example.employeemanagement.service.EmployeeService;
 import com.example.employeemanagement.service.ProjectServiceImp;
 import com.example.employeemanagement.service.TaskServiceImp;
+import jakarta.validation.Valid;
 import org.springframework.scheduling.config.Task;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,8 +26,8 @@ public class EmployeeController {
         this.projectServiceImp=projectServiceImp;
         this.taskServiceImp=taskServiceImp;
     }
-    @PutMapping("/create")
-    public EmployeeResponseDTO createEmployee(@RequestBody EmployeeRequestDTO employee)
+    @PostMapping("/create")
+    public EmployeeResponseDTO createEmployee(@Valid @RequestBody EmployeeRequestDTO employee)
     {
        return  employeeService.addEmployee(employee);
     }
@@ -51,8 +52,8 @@ public class EmployeeController {
         return employeeService.getAllEmployee();
     }
 
-    @PutMapping("/createTask")
-    public TaskResponseDTO createTask(@RequestBody TaskRequestDTO task )
+    @PostMapping("/createTask")
+    public TaskResponseDTO createTask(@Valid @RequestBody TaskRequestDTO task )
     {
         return taskServiceImp.createTask(task);
     }
@@ -64,8 +65,8 @@ public class EmployeeController {
         return "Done";
     }
 
-    @PutMapping("/createProject")
-    public ProjectResponseDTO createProject(@RequestBody ProjectRequestDTO project)
+    @PostMapping("/createProject")
+    public ProjectResponseDTO createProject(@Valid @RequestBody ProjectRequestDTO project)
     {
         return projectServiceImp.createProject(project);
     }
@@ -76,7 +77,7 @@ public class EmployeeController {
         return employeeService.getTask(employeeId);
     }
 
-    @DeleteMapping("/deleteProject/{prrojectId}")
+    @DeleteMapping("/deleteProject/{projectId}")
     public String deleteProject(@PathVariable Integer projectId)
     {
         projectServiceImp.deleteProject(projectId);

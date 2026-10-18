@@ -6,12 +6,12 @@ import java.time.LocalDateTime;
 
 public class TaskResponseDTO {
     private Integer Id;
-    private Integer projectId;
+    private ProjectResponseDTO project;
     private LocalDateTime assignedDate;
     private String status;
 
-    public Integer getProjectId() {
-        return projectId;
+    public ProjectResponseDTO getProject() {
+        return project;
     }
 
     public Integer getId() {
@@ -38,7 +38,7 @@ public class TaskResponseDTO {
         this.status = status;
     }
 
-    public void setProjectId(Integer projectId) {
-        this.projectId = projectId;
+    public void setProject(ProjectResponseDTO project) {
+        this.project = project;
     }
 }

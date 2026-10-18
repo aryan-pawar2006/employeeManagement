@@ -30,6 +30,7 @@ public class TaskServiceImp implements TaskService{
                         .orElseThrow(()->new ResourceNotFound("employee not found!"));
 
         employee.setTaskId(TaskId);
+        employeeRepo.save(employee);
         return "Done";
     }
 
@@ -63,7 +64,10 @@ public class TaskServiceImp implements TaskService{
 
         taskEntity.setStatus(task.getStatus());
         taskEntity.setAssignedDate(task.getAssignedDate());
-        taskEntity.setProjectId(task.getProjectId());
+        //find out the projet first with help of id:
+        ProjectEntity project1=projectRepo.findById(task.getProjectId())
+                        .orElseThrow(()->new ResourceNotFound("project not found"));
+        taskEntity.setProject(project1);
 
         taskRepo.save(taskEntity);
 
@@ -72,7 +76,15 @@ public class TaskServiceImp implements TaskService{
         responseDTO.setStatus(taskEntity.getStatus());
         responseDTO.setId(taskEntity.getId());
         responseDTO.setAssignedDate(taskEntity.getAssignedDate());
-        responseDTO.setProjectId(taskEntity.getProjectId());
+        //get project first:
+        ProjectEntity project2=projectRepo.findById(task.getProjectId())
+                .orElseThrow(()->new ResourceNotFound("project not found"));
+        ProjectResponseDTO  responseDTO1=new ProjectResponseDTO();
+        responseDTO1.setId(project2.getId());
+        responseDTO1.setCreatedAt(project2.getCreatedAt());
+        responseDTO1.setDescription(project2.getDescription());
+        responseDTO1.setTitle(project2.getTitle());
+        responseDTO.setProject(responseDTO1);
 
         return responseDTO;
     }
@@ -86,13 +98,12 @@ public class TaskServiceImp implements TaskService{
     public ProjectResponseDTO getProject(Integer taskId) {
         TaskEntity task=taskRepo.findById(taskId)
                 .orElseThrow(()->new ResourceNotFound("task does not found!"));
-        ProjectEntity project=projectRepo.getById(task.getProjectId());
 
         ProjectResponseDTO responseDTO=new ProjectResponseDTO();
-        responseDTO.setId(project.getId());
-        responseDTO.setTitle(project.getTitle());
-        responseDTO.setDescription(project.getDescription());
-        responseDTO.setCreatedAt(project.getCreatedAt());
+        responseDTO.setId(task.getProject().getId());
+        responseDTO.setTitle(task.getProject().getTitle());
+        responseDTO.setDescription(task.getProject().getDescription());
+        responseDTO.setCreatedAt(task.getProject().getCreatedAt());
         return responseDTO;
     }
 }

@@ -52,7 +52,10 @@ public class ProjectServiceImp implements ProjectService{
     public TaskResponseDTO createTask(TaskRequestDTO task) {
         TaskEntity task1=new TaskEntity();
 
-        task1.setProjectId(task.getProjectId());
+        ProjectEntity project=projectRepo.findById(task.getProjectId())
+                        .orElseThrow(()->new ResourceNotFound("project does not found"));
+
+        task1.setProject(project);
         task1.setAssignedDate(task.getAssignedDate());
         task1.setStatus(task.getStatus());
 
@@ -60,7 +63,16 @@ public class ProjectServiceImp implements ProjectService{
 
          TaskResponseDTO responseDTO=new TaskResponseDTO();
 
-         responseDTO.setProjectId(task1.getProjectId());
+         ProjectEntity project1=projectRepo.findById(task1.getId())
+                 .orElseThrow(()->new RuntimeException("project not found!"));
+         ProjectResponseDTO responseDTO1=new ProjectResponseDTO();
+         responseDTO1.setId(project1.getId());
+         responseDTO1.setTitle(project1.getTitle());
+         responseDTO1.setDescription(project1.getDescription());
+         responseDTO1.setCreatedAt(project1.getCreatedAt());
+
+
+         responseDTO.setProject(responseDTO1);
          responseDTO.setStatus(task1.getStatus());
          responseDTO.setId(task1.getId());
          responseDTO.setAssignedDate(task1.getAssignedDate());
@@ -80,7 +92,7 @@ public class ProjectServiceImp implements ProjectService{
 
         employeeList.stream().filter(employeeEntity -> {
                     TaskEntity task = taskRepo.getById(employeeEntity.getId());
-                    return task.getProjectId()==projectId;
+                    return task.getProject().getId()==projectId;
                 }
         );
 
@@ -117,7 +129,18 @@ public class ProjectServiceImp implements ProjectService{
 
             responseDTO1.setId(task.getId());
             responseDTO1.setAssignedDate(task.getAssignedDate());
-            responseDTO1.setProjectId(task.getProjectId());
+
+            //here we have to fin the project first and then set all the values of it to project Response DTO and then set to response:
+            ProjectEntity project1=projectRepo.findById(task.getId())
+                    .orElseThrow(()->new RuntimeException("project not found!"));
+            ProjectResponseDTO responseDTO=new ProjectResponseDTO();
+            responseDTO.setId(project1.getId());
+            responseDTO.setTitle(project1.getTitle());
+            responseDTO.setDescription(project1.getDescription());
+            responseDTO.setCreatedAt(project1.getCreatedAt());
+
+
+            responseDTO1.setProject(responseDTO);
             responseDTO1.setStatus(task.getStatus());
 
             responseDTOs.add(responseDTO1);

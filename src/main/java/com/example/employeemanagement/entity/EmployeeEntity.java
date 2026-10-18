@@ -54,6 +54,4 @@ public class EmployeeEntity {
         this.taskId = taskId;
     }
 
-    public Integer getIs() {
-    }
 }

@@ -11,7 +11,9 @@ public class TaskEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Integer projectId;
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "project_id" ,nullable = false)
+    private ProjectEntity project;
     private LocalDateTime assignedDate;
     private String status;
 
@@ -19,8 +21,8 @@ public class TaskEntity {
         return id;
     }
 
-    public Integer getProjectId() {
-        return projectId;
+    public ProjectEntity getProject() {
+        return project;
     }
 
     public LocalDateTime getAssignedDate() {
@@ -35,8 +37,8 @@ public class TaskEntity {
         this.id = id;
     }
 
-    public void setProjectId(Integer projectId) {
-        this.projectId = projectId;
+    public void setProject(ProjectEntity project) {
+        this.project = project;
     }
 
     public void setAssignedDate(LocalDateTime assignedDate) {

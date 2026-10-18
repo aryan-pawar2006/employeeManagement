@@ -1,10 +1,8 @@
 package com.example.employeemanagement.service;
 
-import com.example.employeemanagement.dto.EmployeeRequestDTO;
-import com.example.employeemanagement.dto.EmployeeResponseDTO;
-import com.example.employeemanagement.dto.TaskRequestDTO;
-import com.example.employeemanagement.dto.TaskResponseDTO;
+import com.example.employeemanagement.dto.*;
 import com.example.employeemanagement.entity.EmployeeEntity;
+import com.example.employeemanagement.entity.ProjectEntity;
 import com.example.employeemanagement.entity.TaskEntity;
 import com.example.employeemanagement.exception.ResourceNotFound;
 import com.example.employeemanagement.repository.EmployeeRepo;
@@ -116,7 +114,15 @@ public class EmployeeServiceImp implements  EmployeeService{
 
         responseDTO.setId(employee.getId());
         TaskEntity task=taskRepo.getById(employee.getTaskId());
-        responseDTO.setProjectId(task.getProjectId());
+        ProjectEntity project= task.getProject();
+        ProjectResponseDTO responseDTO1=new ProjectResponseDTO();
+
+        responseDTO1.setId(project.getId());
+        responseDTO1.setTitle(project.getTitle());
+        responseDTO1.setDescription(project.getDescription());
+        responseDTO1.setCreatedAt(project.getCreatedAt());
+
+        responseDTO.setProject(responseDTO1);
         responseDTO.setAssignedDate(task.getAssignedDate());
         responseDTO.setStatus(task.getStatus());
         return responseDTO;
